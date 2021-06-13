@@ -32,6 +32,7 @@ from trading_bot.agent import Agent
 from trading_bot.methods import train_model, evaluate_model
 from trading_bot.utils import (
     get_stock_data,
+    get_json_data,
     format_currency,
     format_position,
     show_train_result,
@@ -48,9 +49,15 @@ def main(train_stock, val_stock, window_size, batch_size, ep_count,
     Args: [python train.py --help]
     """
     agent = Agent(window_size, strategy=strategy, pretrained=pretrained, model_name=model_name)
-    
-    train_data = get_stock_data(train_stock)
-    val_data = get_stock_data(val_stock)
+    if train_stock.find('.json') > 0:
+        train_data = get_json_data(train_stock)
+    else:
+        train_data = get_stock_data(train_stock)
+
+    if val_stock.find('.json') > 0:
+        val_data = get_json_data(val_stock)
+    else:
+        val_data = get_stock_data(val_stock)
 
     initial_offset = val_data[1] - val_data[0]
 
@@ -79,7 +86,7 @@ if __name__ == "__main__":
 
     try:
         main(train_stock, val_stock, window_size, batch_size,
-             ep_count, strategy=strategy, model_name=model_name, 
+             ep_count, strategy=strategy, model_name=model_name,
              pretrained=pretrained, debug=debug)
     except KeyboardInterrupt:
         print("Aborted!")
